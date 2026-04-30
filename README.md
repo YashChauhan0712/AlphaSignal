@@ -227,6 +227,11 @@ http://localhost:8501
 
 ---
 
+## 🌐 Live Demo
+
+Try the deployed app here:  
+https://alphasignal-htqfscs5wjbqgt6el4o4jo.streamlit.app/
+
 ## ⚙️ Usage
 
 1. Enter stock tickers (e.g., `AAPL`, `MSFT`, `NVDA`)
