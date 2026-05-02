@@ -229,8 +229,8 @@ http://localhost:8501
 
 ## 🌐 Live Demo
 
-Try the deployed app here:  
-https://alphasignal-htqfscs5wjbqgt6el4o4jo.streamlit.app/
+Try AlphaSignal here:  
+https://alphasignal-2c65.onrender.com/
 
 ## ⚙️ Usage
 
