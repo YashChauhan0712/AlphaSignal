@@ -7,16 +7,6 @@ from sklearn.metrics import confusion_matrix
 from stock_model import run_single_ticker
 
 
-@st.cache_data(show_spinner=False, ttl=3600)
-def cached_run_single_ticker(ticker, threshold, start, step):
-    return run_single_ticker(
-        ticker=ticker,
-        threshold=threshold,
-        start=start,
-        step=step
-    )
-
-
 # ── Page config ──────────────────────────────────────────────────────────────
 
 st.set_page_config(
@@ -284,13 +274,13 @@ with st.sidebar:
 
     ticker_input = st.text_input(
         "Tickers (comma-separated)",
-        value="AAPL",
+        value="AAPL, MSFT, NVDA",
         help="e.g. AAPL, TSLA, ^GSPC"
     )
 
     st.markdown("**Threshold Mode**")
     threshold_mode = st.radio(
-        "",
+        "Threshold Mode",
         ["Adaptive", "Manual"],
         label_visibility="collapsed"
     )
@@ -305,8 +295,8 @@ with st.sidebar:
     )
 
     st.markdown("**Backtest Parameters**")
-    start = st.number_input("Start row", min_value=500, max_value=2000, value=500, step=100)
-    step  = st.number_input("Step size", min_value=250, max_value=1000, value=500, step=250)
+    start = st.number_input("Start row", min_value=500, max_value=10000, value=2500, step=100)
+    step  = st.number_input("Step size", min_value=50,  max_value=1000,  value=250,  step=50)
 
     st.markdown("---")
     run_button = st.button("▶  RUN ANALYSIS", use_container_width=True)
@@ -462,7 +452,7 @@ def display_confusion_matrix(predictions, ticker):
             "<p style='color:#7fb3cc; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:600; margin-bottom:8px;'>CONFUSION MATRIX</p>",
             unsafe_allow_html=True
         )
-        st.dataframe(cm_df, use_container_width=True)
+        st.dataframe(cm_df, width="stretch")
 
     with col_bar:
         counts = predictions["Predictions"].value_counts().sort_index()
@@ -509,9 +499,6 @@ if run_button:
 
     if not tickers:
         st.error("Please enter at least one ticker.")
-    elif len(tickers) > 2:
-        st.warning("For the deployed version, please limit analysis to 2 tickers at a time.")
-        st.stop()
     else:
         summary_rows = []
 
@@ -526,7 +513,7 @@ if run_button:
                 threshold = None if threshold_mode == "Adaptive" else manual_threshold
 
                 with st.spinner(f"Running walk-forward backtest for {ticker}…"):
-                    result = cached_run_single_ticker(
+                    result = run_single_ticker(
                         ticker=ticker,
                         threshold=threshold,
                         start=start,
@@ -660,7 +647,7 @@ else:
             then hit <strong style="color:#00e5a0;">RUN ANALYSIS</strong> to begin.
         </div>
         <div style="color:#64849a; font-size:0.82rem; margin-top:10px;">
-            Production-safe mode: limit to 1–2 Yahoo Finance tickers at a time (e.g. AAPL, MSFT, ^GSPC)
+            Supports any Yahoo Finance ticker — stocks, ETFs, indices (e.g. ^GSPC)
         </div>
     </div>
     """, unsafe_allow_html=True)

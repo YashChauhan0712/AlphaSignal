@@ -11,7 +11,7 @@ from xgboost import XGBClassifier
 
 
 def load_data(ticker: str) -> pd.DataFrame:
-    data = yf.Ticker(ticker).history(period="5y")
+    data = yf.Ticker(ticker).history(period="max")
     data = data.drop(columns=["Dividends", "Stock Splits"], errors="ignore")
 
     if data.empty:
@@ -68,10 +68,9 @@ def create_features(data: pd.DataFrame):
 
     data = data.dropna()
 
-    if len(data) < 600:
+    if len(data) < 3000:
         raise ValueError(
-            "Not enough usable historical data after feature engineering. "
-            "Try an older ticker or lower the backtest start row."
+            "Not enough usable historical data after feature engineering."
         )
 
     return data, predictors
@@ -129,7 +128,7 @@ def get_adaptive_settings(regime_info: dict, user_threshold=None) -> dict:
     return {
         "threshold": threshold,
         "min_samples_split": min_samples_split,
-        "n_estimators": 75,
+        "n_estimators": 100,
     }
 
 
@@ -142,9 +141,9 @@ def build_models(settings: dict):
     )
 
     xgb = XGBClassifier(
-        n_estimators=75,
-        max_depth=3,
-        learning_rate=0.08,
+        n_estimators=200,
+        max_depth=4,
+        learning_rate=0.05,
         subsample=0.8,
         colsample_bytree=0.8,
         eval_metric="logloss",
@@ -381,7 +380,7 @@ def feature_importance_report(data, predictors, settings):
     ).sort_values(ascending=False)
 
 
-def run_single_ticker(ticker, threshold=None, start=500, step=500):
+def run_single_ticker(ticker, threshold=None, start=2500, step=250):
     data = load_data(ticker)
     data, predictors = create_features(data)
 
@@ -491,5 +490,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
